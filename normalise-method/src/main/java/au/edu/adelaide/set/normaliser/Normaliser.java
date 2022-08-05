@@ -1,6 +1,16 @@
 package au.edu.adelaide.set.normaliser;
 
-import au.edu.adelaide.set.writer.FW;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -9,13 +19,9 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.utils.CodeGenerationUtils;
 import com.github.javaparser.utils.Log;
 import com.github.javaparser.utils.SourceRoot;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import au.edu.adelaide.set.writer.FileManager;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Optional;
+import au.edu.adelaide.set.writer.FW;
+import au.edu.adelaide.set.writer.FileManager;
 
 public class Normaliser {
 
@@ -36,8 +42,8 @@ public class Normaliser {
         if (outputDirectory.exists()) {
             FileUtils.deleteDirectory(new File(outputMainDirectory));
         }
-        Files.walk(sourceRoot.getRoot())
-                .filter(path -> path.toString().endsWith(FILE_EXT_JAVA))
+        try (Stream<Path> walk = Files.walk(sourceRoot.getRoot())) {
+            walk.filter(path -> path.toString().endsWith(FILE_EXT_JAVA))
                 .forEach(path -> {
                     String fileNameWithOutExt = FilenameUtils.removeExtension(path.getFileName().toString());
                     String outputFilePath = path.toString().split(INPUT_ROOT)[1].replace(path.getFileName().toString(), "");
@@ -64,6 +70,7 @@ public class Normaliser {
                         return;
                     }
             });
+        }
     }
 
     private static String createMethodString (MethodDeclaration m) {

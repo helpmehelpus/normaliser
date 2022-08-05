@@ -7,18 +7,18 @@ import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
-public class FW  implements IWriter {
+public class FW implements IWriter {
 
     private static FW instance;
 
     public static FW instance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new FW();
         }
         return instance;
     }
 
-    private FW () {
+    private FW() {
 
     }
 
@@ -29,15 +29,10 @@ public class FW  implements IWriter {
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
-        try {
-            File file = new File(outputFile);
-            FileWriter fw = new FileWriter(file, true);
-            BufferedWriter bw = new BufferedWriter(fw);
+        File file = new File(outputFile);
+        try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw);) {
             bw.write(methodString);
-            bw.close();
-            fw.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
